@@ -28,3 +28,10 @@ The main deliberate trade-off: octal escapes are supported even though strict-mo
 * `\u####` can express lone surrogates (e.g. `\uD83D`); this library passes them through as single code units. `\u{...}` rejects lone surrogates, matching JavaScript's `SyntaxError`.
 * The result is normalised to NFC, so `\u0065\u0301` and `\u00e9` produce the same Python string. If you need byte-exact preservation of decomposed sequences, NFC normalisation will change them.
 * An unrecognised escape like `\z` raises `DecodeError` rather than passing the backslash through silently, matching strict-mode JS.
+
+## Design notes
+
+The window stores values eagerly rather than keeping running aggregates. Running
+sums drift with floating point over long streams, and recomputing from a small
+buffer is cheap enough that the drift is not worth the speed.
+
